@@ -2,14 +2,14 @@ import static java.lang.Math.*;
 
 public class Helper {
 
-    public double exponentialDistribution(double lambda){
+    public static double exponentialDistribution(double lambda){
         double j1 = Math.random();
         if(j1 == 0){ j1 = j1 + 0.001;}
         double j2 = -Math.log(j1)/lambda;
         return j2;
     }
 
-    public int poissonDistribution(double lambda){
+    public static int poissonDistribution(double lambda){
         double k, L, j1, j2, j3;
         int p;
         j1 = Math.random();
@@ -31,7 +31,7 @@ public class Helper {
         return (int) (k-1);
     }
 
-    public int normalDistribution(double mean, double stdev){
+    public static int normalDistribution(double mean, double stdev){
         double v1, v2, t;
         int x;
         do{
@@ -43,9 +43,9 @@ public class Helper {
         } while (t >= 1 || t ==0);
         double multiplier = Math.sqrt(-2*log(t)/t);
         x = (int) (v1 * multiplier * stdev + mean);
-        return x;
+        return x;  //Waarom moet dit een int returnen?
     }
-    public int bernoulliDistribution(double prob){
+    public static int bernoulliDistribution(double prob){
         double j1 = Math.random();
         if (j1 < prob)
             return 0;
@@ -53,14 +53,13 @@ public class Helper {
             return 1;
     }
 
-    public int uniformDistribution(double a, double b){
+    public static int uniformDistribution(double a, double b){
         double j1 = Math.random();
         return (int) (a + (b-a) * j1);
     }
 
-    int Triangular_distribution(int a, int b, int c){
+    public static int Triangular_distribution(int a, int b, int c){
         double mean, stdev,x, L;
-
         mean = (a+b+c)/3;
         stdev = (Math.pow(a,2)+Math.pow(b,2)+Math.pow(c,2)-a*b-a*c-b*c)/18;
         stdev = Math.sqrt(stdev);
