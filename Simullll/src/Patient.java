@@ -38,6 +38,19 @@ public class Patient {
         this.duration = duration;
     }
 
+    public Patient(int nr, int patientType, int scanType, int callWeek, int callDay, double callTime, double tardiness, boolean isNoShow,
+                   double duration) {
+        this.nr = nr;
+        this.patientType = patientType;
+        ScanType = scanType;
+        this.callWeek = callWeek;
+        this.callDay = callDay;
+        this.callTime = callTime;
+        this.tardiness = tardiness;
+        this.isNoShow = isNoShow;
+        this.duration = duration;
+    }
+
     public int getNr() {
         return nr;
     }

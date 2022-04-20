@@ -2,7 +2,8 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Simulation<simulation> {
+
+public class Simulation<simulation> extends Helper {
 
     String inputFileName = null; //zelf invullen
     int D = 6;
@@ -10,8 +11,20 @@ public class Simulation<simulation> {
     int S = 32 + amountOTSlotsPerDay;
     double slotLength = 15/60;
     double lambdaElective = 28.345;
-    double[] lambdaUrgent = new double[2];
+    double[] lambdaUrgent = new double[]{2.5, 1.25};
     double weightUr = 1/9;
+    double[] cumulativeProbUrgentType = new double[]{0.7, 0.8, 0.9, 0.95, 1.0};
+    double[] probUrgentType = new double[]{0.7, 0.1, 0.1, 0.05, 0.05};
+    double[] meanUrgentDuration = {15, 17.5, 22.5, 30, 30};
+    double[] stdevUrgentDuration = {2.5, 1, 2.5, 1, 4.5};
+    double weightEl = 1.0 / 168.0;      // objective weight elective appointment wait time
+    double meanTardiness = 0;
+    double stdevTardiness = 2.5;
+    double probNoShow = 0.02;
+    double meanElectiveDuration = 15;
+    double stdevElectiveDuration = 3;
+    List<Patient> patients = new ArrayList<>(); //zelfde comment als hieronder
+
 
     //Staan normaal onder simulation(), heb ze eens naar hier verplaatst
     int W = 10;                      // number of weeks to simulate = run lenght
@@ -45,12 +58,10 @@ public class Simulation<simulation> {
         double[] movingAvgUrgentScanWT = new double[W];
         double[] movingAvgOT = new double[W];
     }
-    simulation::simulation(){
-    }
+    //simulation::simulation(){ }
 
     public void resetSystem(){
 
-        List<Patient> patients = new ArrayList<>();
         double[] movingAvgElectiveAppWT = new double[100];
         double[] movingAvgElectiveScanWT = new double[100];
         double[] movingAvgUrgentScanWT = new double[100];
@@ -75,40 +86,40 @@ public class Simulation<simulation> {
 
     public void setWeekSchedule(){
         // Read and set the slot types (0=none, 1=elective, 2=urgent within normal working hours)
-        ifstream inputFile; //Wat komt hier?
-        inputFile.open(inputFileName);
+        //ifstream inputFile; //Wat komt hier?
+        //inputFile.open(inputFileName);
         int elementInt;
         for(int s = 0; s < 32; s++){
             for(int d = 0; d < D; d++){
-                inputFile >> elementInt;
-                weekSchedule[d][s].slotType = elementInt;
-                weekSchedule[d][s].patientType = elementInt;
+                //inputFile >> elementInt;
+                weekSchedule[d][s].setSlotType(elementInt);
+                weekSchedule[d][s].setPatientType(elementInt);
             }
         }
-        inputFile.close();
+        //inputFile.close();
 
         // Set the type of the overtime slots (3=urgent in overtime)
         for(int d = 0; d < D; d++){
             for(int s = 32; s < S; s++){
-                weekSchedule[d][s].slotType = 3;
-                weekSchedule[d][s].patientType = 2;
+                weekSchedule[d][s].setSlotType(3);
+                weekSchedule[d][s].setPatientType(2);
             }
         }
 
-        // set start and appoitnment time
+        // set start and appointment time
         double time;
         for(int d = 0; d < D; d++){
             time = 8; // start time slot schedule
             for(int s = 0; s < S; s++){
                 // start time slot
-                weekSchedule[d][s].startTime = time;
+                weekSchedule[d][s].setStartTime(time);
 
                 // appointment time slot
-                if(weekSchedule[d][s].slotType != 1){    // all slot types not elective : appointment time = slot start time
-                    weekSchedule[d][s].appTime = time;
+                if(weekSchedule[d][s].getSlotType() != 1){    // all slot types not elective : appointment time = slot start time
+                    weekSchedule[d][s].setAppTime(time);
                 }else{                                   // elective slots: appointment time is set according to rule !
                     if(rule == 1){ // FIFO
-                        weekSchedule[d][s].appTime = time;
+                        weekSchedule[d][s].setAppTime(time);
                     }else if(rule == 2){
                         // TODO: Bailey-Welch rule
                     }else if(rule == 3){
@@ -119,14 +130,14 @@ public class Simulation<simulation> {
                 }
 
                 //update time variable
-                time += slotLenght;
+                time += slotLength;
                 if(time == 12){ time = 13;} // skip to the end of the luchbreak
             }
         }
     }
 
     public int getRandomScanType(){
-        float r = float (rand()%1000)/1000;
+        double r = Math.random();
         int type = -1;
         for(int i = 0; i < 5 && type == -1; i++){
             if(r < cumulativeProbUrgentType[i]){ type = i; }
@@ -140,23 +151,25 @@ public class Simulation<simulation> {
         int patientType, scanType, endTime;
         double callTime, tardiness, duration, lambda;
         boolean noShow;
-        std::default_random_engine generator;
+
+        //std::default_random_engine generator; NOG TE DOEN
+
         for(int w = 0; w < W; w++){
             for(int d = 0; d < D; d++){ // not on Sunday
                 // generate ELECTIVE patients for this day
                 if(d < D - 1){  // not on Saturday either
-                    arrivalTimeNext = 8 + exponentialDistr(lambdaElective) * (17-8);
+                    arrivalTimeNext = 8 + exponentialDistribution(lambdaElective) * (17-8);
                     while(arrivalTimeNext < 17){ // desk open from 8h until 17h
                         patientType = 1;                // elective
                         scanType = 0;                   // no scan type
                         callTime = arrivalTimeNext;     // set call time, i.e. arrival event time
-                        tardiness = Normal_distribution(meanTardiness, stdevTardiness) / 60.0;       // in practice this is not known yet at time of call
-                        noShow = Bernouilli_distribution(probNoShow);                                // in practice this is not known yet at time of call
-                        duration = Normal_distribution(meanElectiveDuration, stdevElectiveDuration) / 60.0; // in practice this is not known yet at time of call
-                        Patient patient{counter, patientType, scanType, w, d, callTime, tardiness, noShow, duration};
-                        patients.push_back(patient);
+                        tardiness = normalDistribution(meanTardiness, stdevTardiness) / 60.0;       // in practice this is not known yet at time of call
+                        noShow = bernoulliDistribution(probNoShow);                                // in practice this is not known yet at time of call
+                        duration = normalDistribution(meanElectiveDuration, stdevElectiveDuration) / 60.0; // in practice this is not known yet at time of call
+                        Patient patient = new Patient(counter, patientType, scanType, w, d, callTime, tardiness, noShow, duration);
+                        patients.add(patient);
                         counter++;
-                        arrivalTimeNext = arrivalTimeNext + Exponential_distribution(lambdaElective) * (17-8); // arrival time of next patient (if < 17h)
+                        arrivalTimeNext = arrivalTimeNext + exponentialDistribution(lambdaElective) * (17-8); // arrival time of next patient (if < 17h)
                     }
                 }
 
@@ -168,18 +181,18 @@ public class Simulation<simulation> {
                     lambda = lambdaUrgent[0];
                     endTime = 17;
                 }
-                arrivalTimeNext = 8 + Exponential_distribution(lambda) * (endTime-8);
+                arrivalTimeNext = 8 + exponentialDistribution(lambda) * (endTime-8);
                 while(arrivalTimeNext < endTime){ // desk open from 8h until 17h
                     patientType = 2;                // urgent
                     scanType = getRandomScanType(); // set scan type
                     callTime = arrivalTimeNext;     // set arrival time, i.e. arrival event time
                     tardiness = 0;                  // urgent patients have an arrival time = arrival event time
                     noShow = false;                 // urgent patients are never no-show
-                    duration = Normal_distribution(meanUrgentDuration[scanType], stdevUrgentDuration[scanType]) / 60.0; // in practice this is not known yet at time of arrival
-                    Patient patient{counter, patientType, scanType, w, d, callTime, tardiness, noShow, duration};
-                    patients.push_back(patient);
+                    duration = normalDistribution(meanUrgentDuration[scanType], stdevUrgentDuration[scanType]) / 60.0; // in practice this is not known yet at time of arrival
+                    Patient patient = new Patient(counter, patientType, scanType, w, d, callTime, tardiness, noShow, duration);
+                    patients.add(patient);
                     counter++;
-                    arrivalTimeNext = arrivalTimeNext + Exponential_distribution(lambda) * (endTime-8); // arrival time of next patient (if < 17h)
+                    arrivalTimeNext = arrivalTimeNext + exponentialDistribution(lambda) * (endTime-8); // arrival time of next patient (if < 17h)
                 }
             }
         }
@@ -189,22 +202,19 @@ public class Simulation<simulation> {
         boolean found = false;
         int slotNr = -1;
         for(int s = 0; !found && s < S; s++){
-            if(weekSchedule[day][s].appTime > time && patientType == weekSchedule[day][s].patientType){
+            if(weekSchedule[day][s].getAppTime() > time && patientType == weekSchedule[day][s].getPatientType()){
                 found = true;
                 slotNr = s;
             }
         }
         if(!found){
-            System.out.println("NO SLOT EXISTS DURING TIME %.2f \n", time);
+            System.out.println("NO SLOT EXISTS DURING TIME %.2f \n" + time);
             System.exit(0);
         }
         return slotNr;
     }
 
     public void schedulePatients(){
-
-        Slot[][] weekSchedule;
-        List<Patient> patients = new ArrayList<>();
 
         //sort arrival events (= patient list) on arrival time (call time for elective patients, arrival time for urgent)
         patients.sort([](const Patient &patient1, const Patient &patient2){
@@ -221,16 +231,16 @@ public class Simulation<simulation> {
             return true;
         });
 
-        int week[2] = {0,0}; // week of the next available slot {elective,urgent}
-        int day[2] = {0,0}; // day of the next available slot {elective,urgent}
-        int slot[2] = {0,0}; // slotNr of the next available slot {elective,urgent}
+        int[] week = {0,0}; // week of the next available slot {elective,urgent}
+        int[] day = {0,0}; // day of the next available slot {elective,urgent}
+        int[] slot = {0,0}; // slotNr of the next available slot {elective,urgent}
 
         //find first slot of each patient type (note, we assume each day (i.e. also day 0) has at least one slot of each patient type!)
         //elective
         int d = 0;
         boolean found = false;
         for(int s = 0; s < S && !found; s++){
-            if(weekSchedule[d][s].patientType == 1){
+            if(weekSchedule[d][s].getPatientType() == 1){
                 day[0] = d;
                 slot[0] = s;
                 found = true;
@@ -239,7 +249,7 @@ public class Simulation<simulation> {
         //urgent
         found = false;
         for(int s = 0; s < S && !found; s++){
-            if(weekSchedule[d][s].patientType == 2){
+            if(weekSchedule[d][s].getPatientType() == 2){
                 day[1] = d;
                 slot[1] = s;
                 found = true;
@@ -322,7 +332,7 @@ public class Simulation<simulation> {
                 for(int w = week[i]; w < W && !found; w++){
                     for(d = startD; d < D && !found; d++){
                         for(int s = startS; s < S && !found; s++){
-                            if(weekSchedule[d][s].patientType == patient.getPatientType()){
+                            if(weekSchedule[d][s].getPatientType() == patient.getPatientType()){
                                 week[i] = w;
                                 day[i] = d;
                                 slot[i] = s;
@@ -397,12 +407,8 @@ public class Simulation<simulation> {
         // determine scan wait time per patient and overtime per day
         int prevWeek = 0;
         int prevDay = -1;
-        int numberOfPatientsWeek[ 2] ={
-            0, 0
-        } ;
-        int numberOfPatients[ 2] ={
-            0, 0
-        } ;
+        int[] numberOfPatientsWeek = {0, 0};
+        int[] numberOfPatients = {0, 0};
         double arrivalTime, wt;
         double prevScanEndTime = 0;
         boolean prevIsNoShow = false;

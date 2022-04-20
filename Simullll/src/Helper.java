@@ -45,12 +45,12 @@ public class Helper {
         x = (int) (v1 * multiplier * stdev + mean);
         return x;  //Waarom moet dit een int returnen?
     }
-    public static int bernoulliDistribution(double prob){
+    public static boolean bernoulliDistribution(double prob){
         double j1 = Math.random();
         if (j1 < prob)
-            return 0;
+            return false;
         else
-            return 1;
+            return true;
     }
 
     public static int uniformDistribution(double a, double b){
