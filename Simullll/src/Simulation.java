@@ -36,7 +36,7 @@ public class Simulation<simulation> {
         int numberOfUrgentPatientsPlanned = 0;
 
         // Initialize arrays
-        Slot[] weekSchedule = new Slot[D]; //er stond Slot[D]
+        Slot[][] weekSchedule = new Slot[D][S]; //er stond Slot[D]
         for(int d = 0; d < D; d++){
             weekSchedule[d] = new Slot[S];
         }
