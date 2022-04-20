@@ -154,7 +154,7 @@ public class Patient {
         if(slotNr != -1){
             return (double)(((scanWeek-callWeek)*7 + scanDay - callDay)*24 + appTime - callTime); // in hours
         }else{
-            System.out.println("CAN NOT CALCULATE APPOINTMENT WT OF PATIENT %d",  nr);
+            System.out.println("CAN NOT CALCULATE APPOINTMENT WT OF PATIENT %d" +  nr);
             System.exit(1);
         }
     }
@@ -169,7 +169,7 @@ public class Patient {
             }
             return Math.max(0.0,wt);
         }else{
-            System.out.println("CAN NOT CALCULATE SCAN WT OF PATIENT %d", nr);  // in hours
+            System.out.println("CAN NOT CALCULATE SCAN WT OF PATIENT %d" + nr);  // in hours
             System.exit(1);
         }
     }
