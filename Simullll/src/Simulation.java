@@ -312,9 +312,9 @@ public class Simulation<simulation> {
 
                 // set next slot of the current patient type
                 found = false; int startD = day[i]; int startS = slot[i] + 1;
-                for(w = week[i]; w < W && !found; w++){
+                for(int w = week[i]; w < W && !found; w++){
                     for(d = startD; d < D && !found; d++){
-                        for(s = startS; s < S && !found; s++){
+                        for(int s = startS; s < S && !found; s++){
                             if(weekSchedule[d][s].patientType == patient->patientType){
                                 week[i] = w;
                                 day[i] = d;
@@ -337,7 +337,9 @@ public class Simulation<simulation> {
         avgElectiveAppWT = avgElectiveAppWT / numberOfElective;
     }
 
-    void simulation::sortPatientsOnAppTime(){
+    public void sortPatientsOnAppTime(){
+
+        List<Patient> patients = new ArrayList<>();
         patients.sort([](const Patient &patient1, const Patient &patient2){
             // unplanned patients at the end of the list in order of their call
             if(patient1.scanWeek == -1 && patient2.scanWeek == -1){
