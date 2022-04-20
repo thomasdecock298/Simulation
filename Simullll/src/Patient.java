@@ -150,7 +150,7 @@ public class Patient {
         this.duration = duration;
     }
 
-    public double getAppWT(double nr){
+    public double getAppWT(int nr){
         if(slotNr != -1){
             return (double)(((scanWeek-callWeek)*7 + scanDay - callDay)*24 + appTime - callTime); // in hours
         }else{
@@ -159,7 +159,7 @@ public class Patient {
         }
     }
 
-    public double getScanWT(double){
+    public double getScanWT(int nr){
         if(scanTime != 0){
             double wt = 0;
             if(patientType == 1){ // elective
