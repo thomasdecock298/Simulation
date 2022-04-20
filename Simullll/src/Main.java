@@ -66,7 +66,7 @@ public class Main {
         System.out.println("countSuccess after for-loop: " + countSuccess);
         double average;
         average = countSuccess/K; //The average success rate is then calculated and printed out.
-        System.out.print(average);
+        System.out.print(average); //test
     }
 }
 /*
