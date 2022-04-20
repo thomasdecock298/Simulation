@@ -68,6 +68,7 @@ public class Main {
         average = countSuccess/K; //The average success rate is then calculated and printed out.
         System.out.print(average); //test
     }
+    //test
 }
 /*
 2 simulations with K = 1,000,000,000
