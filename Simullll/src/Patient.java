@@ -1,3 +1,6 @@
+
+
+
 public class Patient {
 
     private int nr;
@@ -14,6 +17,7 @@ public class Patient {
     private boolean isNoShow;
     private double scanTime = -1;
     private double duration;
+    private double appWT;
 
     public Patient(int nr, int patientType, int scanType, int callWeek, int callDay, double callTime, int scanDay,
                    int slotNr, int scanWeek, double appTime, double tardiness, boolean isNoShow, double scanTime,
@@ -146,8 +150,28 @@ public class Patient {
         this.duration = duration;
     }
 
-    public void getAppWP(double) {
+    public double getAppWT(double nr){
+        if(slotNr != -1){
+            return (double)(((scanWeek-callWeek)*7 + scanDay - callDay)*24 + appTime - callTime); // in hours
+        }else{
+            System.out.println("CAN NOT CALCULATE APPOINTMENT WT OF PATIENT %d",  nr);
+            System.exit(1);
+        }
+    }
 
+    public double getScanWT(double){
+        if(scanTime != 0){
+            double wt = 0;
+            if(patientType == 1){ // elective
+                wt = scanTime - (appTime + tardiness);
+            }else{ // urgent
+                wt = scanTime - callTime;
+            }
+            return Math.max(0.0,wt);
+        }else{
+            System.out.println("CAN NOT CALCULATE SCAN WT OF PATIENT %d", nr);  // in hours
+            System.exit(1);
+        }
     }
 
 }
