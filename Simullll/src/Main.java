@@ -69,3 +69,10 @@ public class Main {
         System.out.print(average);
     }
 }
+/*
+2 simulations with K = 1,000,000,000
+0.001979652
+0.001981672
+https://socratic.org/questions/suppose-five-cards-are-drawn-from-a-deck-what-is-the-probability-of-obtaining-a-
+According to this site: it should be 0.001980792
+ */
