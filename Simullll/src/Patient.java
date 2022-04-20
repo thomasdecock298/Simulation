@@ -15,6 +15,25 @@ public class Patient {
     private double scanTime = -1;
     private double duration;
 
+    public Patient(int nr, int patientType, int scanType, int callWeek, int callDay, double callTime, int scanDay,
+                   int slotNr, int scanWeek, double appTime, double tardiness, boolean isNoShow, double scanTime,
+                   double duration) {
+        this.nr = nr;
+        this.patientType = patientType;
+        ScanType = scanType;
+        this.callWeek = callWeek;
+        this.callDay = callDay;
+        this.callTime = callTime;
+        this.scanDay = scanDay;
+        this.slotNr = slotNr;
+        this.scanWeek = scanWeek;
+        this.appTime = appTime;
+        this.tardiness = tardiness;
+        this.isNoShow = isNoShow;
+        this.scanTime = scanTime;
+        this.duration = duration;
+    }
+
     public int getNr() {
         return nr;
     }
@@ -125,5 +144,9 @@ public class Patient {
 
     public void setDuration(double duration) {
         this.duration = duration;
+    }
+
+    public void getAppWP(double) {
+
     }
 }
