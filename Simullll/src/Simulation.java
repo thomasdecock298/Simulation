@@ -1,3 +1,7 @@
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Simulation<simulation> {
 
     String inputFileName = null; //zelf invullen
@@ -6,7 +10,10 @@ public class Simulation<simulation> {
     int S = 32 + amountOTSlotsPerDay;
     double slotLength = 15/60;
     double lambdaElective = 28.345;
-    double[] lambdaUrgent = new double[];
+    double[] lambdaUrgent = new double[2];
+    double weightUr = 1/9;
+
+
 
     // Initialization of a "simulation" object
     public void simulation(){
@@ -16,6 +23,7 @@ public class Simulation<simulation> {
         int W = 10;                      // number of weeks to simulate = run lenght
         int R = 1;                      // number of replications
         int rule = 1;                   // the appointment scheduling rule to apply
+        Slot weekSchedule;
 
         // Initialize variables
         double avgElectiveAppWT = 0;
@@ -26,7 +34,7 @@ public class Simulation<simulation> {
         int numberOfUrgentPatientsPlanned = 0;
 
         // Initialize arrays
-        int[] ArrayweekSchedule = new Slot*[D];
+        int[] ArrayweekSchedule = new int[D]; //er stond Slot[D]
         for(int d = 0; d < D; d++){
             weekSchedule[d] = new Slot[S];
         }
@@ -39,6 +47,8 @@ public class Simulation<simulation> {
     }
 
     public void resetSystem(){
+
+        List<Patient> patients = new ArrayList<>();
         // reset all variables related to 1 replication
         patients.clear();
         double avgElectiveAppWT = 0;
@@ -185,6 +195,10 @@ public class Simulation<simulation> {
     }
 
     public void schedulePatients(){
+
+        Slot[][] weekSchedule;
+        List<Patient> patients = new ArrayList<>();
+
         //sort arrival events (= patient list) on arrival time (call time for elective patients, arrival time for urgent)
         patients.sort([](const Patient &patient1, const Patient &patient2){
             if (patient1.callWeek != patient2.callWeek)
