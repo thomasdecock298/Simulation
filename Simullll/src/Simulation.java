@@ -1,46 +1,46 @@
-public class Simulation {
-    /*
+public class Simulation<simulation> {
+
     // Initialization of a "simulation" object
-    simulation::simulation(){
+    public void simulation(){
         // Set test case variables
         //TODO: set these variables to the correct values
-        inputFileName = "/Users/tinemeersman/Documents/project SMA 2022 student code /input-S1-14.txt";  // input file with schedule
-        W = 10;                      // number of weeks to simulate = run lenght
-        R = 1;                      // number of replications
-        rule = 1;                   // the appointment scheduling rule to apply
+        //inputFileName = "/Users/tinemeersman/Documents/project SMA 2022 student code /input-S1-14.txt";  // input file with schedule
+        int W = 10;                      // number of weeks to simulate = run lenght
+        int R = 1;                      // number of replications
+        int rule = 1;                   // the appointment scheduling rule to apply
 
         // Initialize variables
-        avgElectiveAppWT = 0;
-        avgElectiveScanWT = 0;
-        avgUrgentScanWT = 0;
-        avgOT = 0;
-        numberOfElectivePatientsPlanned = 0;
-        numberOfUrgentPatientsPlanned = 0;
+        double avgElectiveAppWT = 0;
+        double avgElectiveScanWT = 0;
+        double avgUrgentScanWT = 0;
+        double avgOT = 0;
+        int numberOfElectivePatientsPlanned = 0;
+        int numberOfUrgentPatientsPlanned = 0;
 
         // Initialize arrays
-        weekSchedule = new Slot*[D];
-        for(d = 0; d < D; d++){
+        int[] ArrayweekSchedule = new Slot*[D];
+        for(int d = 0; d < D; d++){
             weekSchedule[d] = new Slot[S];
         }
-        movingAvgElectiveAppWT = new double[W];
-        movingAvgElectiveScanWT = new double[W];
-        movingAvgUrgentScanWT = new double[W];
-        movingAvgOT = new double[W];
+        double[] movingAvgElectiveAppWT = new double[W];
+        double[] movingAvgElectiveScanWT = new double[W];
+        double[] movingAvgUrgentScanWT = new double[W];
+        double[] movingAvgOT = new double[W];
     }
-    simulation::~simulation(){
+    simulation::simulation(){
     }
 
-    void simulation::resetSystem(){
+    public void resetSystem(){
         // reset all variables related to 1 replication
         patients.clear();
-        avgElectiveAppWT = 0;
-        avgElectiveScanWT = 0;
-        avgUrgentScanWT = 0;
-        avgOT = 0;
-        numberOfElectivePatientsPlanned = 0;
-        numberOfUrgentPatientsPlanned = 0;
+        double avgElectiveAppWT = 0;
+        double avgElectiveScanWT = 0;
+        double avgUrgentScanWT = 0;
+        double avgOT = 0;
+        int numberOfElectivePatientsPlanned = 0;
+        int numberOfUrgentPatientsPlanned = 0;
 
-        for(w = 0; w < W; w++){
+        for(int w = 0; w < W; w++){
             movingAvgElectiveAppWT[w] = 0;
             movingAvgElectiveScanWT[w] = 0;
             movingAvgUrgentScanWT[w] = 0;
@@ -48,13 +48,13 @@ public class Simulation {
         }
     }
 
-    void simulation::setWeekSchedule(){
+    public void setWeekSchedule(){
         // Read and set the slot types (0=none, 1=elective, 2=urgent within normal working hours)
-        ifstream inputFile;
+        ifstream inputFile; //Wat komt hier?
         inputFile.open(inputFileName);
         int elementInt;
-        for(s = 0; s < 32; s++){
-            for(d = 0; d < D; d++){
+        for(int s = 0; s < 32; s++){
+            for(int d = 0; d < D; d++){
                 inputFile >> elementInt;
                 weekSchedule[d][s].slotType = elementInt;
                 weekSchedule[d][s].patientType = elementInt;
@@ -63,8 +63,8 @@ public class Simulation {
         inputFile.close();
 
         // Set the type of the overtime slots (3=urgent in overtime)
-        for(d = 0; d < D; d++){
-            for(s = 32; s < S; s++){
+        for(int d = 0; d < D; d++){
+            for(int s = 32; s < S; s++){
                 weekSchedule[d][s].slotType = 3;
                 weekSchedule[d][s].patientType = 2;
             }
@@ -72,9 +72,9 @@ public class Simulation {
 
         // set start and appoitnment time
         double time;
-        for(d = 0; d < D; d++){
+        for(int d = 0; d < D; d++){
             time = 8; // start time slot schedule
-            for(s = 0; s < S; s++){
+            for(int s = 0; s < S; s++){
                 // start time slot
                 weekSchedule[d][s].startTime = time;
 
@@ -100,7 +100,7 @@ public class Simulation {
         }
     }
 
-    int simulation::getRandomScanType(){
+    public int getRandomScanType(){
         float r = float (rand()%1000)/1000;
         int type = -1;
         for(int i = 0; i < 5 && type == -1; i++){
@@ -109,18 +109,18 @@ public class Simulation {
         return type;
     }
 
-    void simulation::generatePatients(){
+    public void generatePatients(){
         double arrivalTimeNext;
         int counter = 0; // total number of patients so far
         int patientType, scanType, endTime;
         double callTime, tardiness, duration, lambda;
-        bool noShow;
+        boolean noShow;
         std::default_random_engine generator;
-        for(w=0; w < W; w++){
-            for(d = 0; d < D; d++){ // not on Sunday
+        for(int w = 0; w < W; w++){
+            for(int d = 0; d < D; d++){ // not on Sunday
                 // generate ELECTIVE patients for this day
-                if(d < D-1){  // not on Saturday either
-                    arrivalTimeNext = 8 + Exponential_distribution(lambdaElective) * (17-8);
+                if(d < D - 1){  // not on Saturday either
+                    arrivalTimeNext = 8 + exponentialDistr(28.345) * (17-8); //lambdaElective van patients
                     while(arrivalTimeNext < 17){ // desk open from 8h until 17h
                         patientType = 1;                // elective
                         scanType = 0;                   // no scan type
